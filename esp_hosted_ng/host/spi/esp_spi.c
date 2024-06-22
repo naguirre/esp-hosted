@@ -56,6 +56,7 @@ static void close_data_path(void)
 
 static irqreturn_t spi_data_ready_interrupt_handler(int irq, void *dev)
 {
+	printk(KERN_ERR "%s\n",__func__);
 	/* ESP peripheral has queued buffer for transmission */
 	if (spi_context.spi_workqueue)
 		queue_work(spi_context.spi_workqueue, &spi_context.spi_work);
@@ -65,6 +66,7 @@ static irqreturn_t spi_data_ready_interrupt_handler(int irq, void *dev)
 
 static irqreturn_t spi_interrupt_handler(int irq, void *dev)
 {
+	printk(KERN_ERR "%s\n",__func__);
 	/* ESP peripheral is ready for next SPI transaction */
 	if (spi_context.spi_workqueue)
 		queue_work(spi_context.spi_workqueue, &spi_context.spi_work);
@@ -419,7 +421,7 @@ static int spi_dev_init(int spi_clk_mhz)
 	strscpy(esp_board.modalias, "esp_spi", sizeof(esp_board.modalias));
 	esp_board.mode = SPI_MODE_2;
 	esp_board.max_speed_hz = spi_clk_mhz * NUMBER_1M;
-	esp_board.bus_num = 0;
+	esp_board.bus_num = 1;
 	esp_board.chip_select = 0;
 
 	master = spi_busnum_to_master(esp_board.bus_num);

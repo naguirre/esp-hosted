@@ -961,7 +961,9 @@ static void esp_reset(void)
 
 			/* HOST's resetpin set to LOW */
 			gpio_set_value(resetpin, 0);
-			udelay(200);
+			mdelay(200);
+			gpio_set_value(resetpin, 1);
+
 
 			/* HOST's resetpin set to INPUT */
 			gpio_direction_input(resetpin);
