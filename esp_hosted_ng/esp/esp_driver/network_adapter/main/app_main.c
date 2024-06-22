@@ -494,11 +494,11 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
 #if CONFIG_ESP_WLAN_DEBUG
 	ESP_LOG_BUFFER_HEXDUMP(TAG_RX, payload, 8, ESP_LOG_INFO);
 #endif
-	/*ESP_LOG_BUFFER_HEXDUMP("SDIO Rx", payload, payload_len, ESP_LOG_INFO);*/
+	ESP_LOG_BUFFER_HEXDUMP("SDIO Rx", payload, payload_len, ESP_LOG_INFO);
 
 	if (header->packet_type == PACKET_TYPE_COMMAND_REQUEST) {
 		/* Process command Request */
-		/*ESP_LOG_BUFFER_HEXDUMP("Rx Cmd", payload, payload_len, ESP_LOG_INFO);*/
+		ESP_LOG_BUFFER_HEXDUMP("Rx Cmd", payload, payload_len, ESP_LOG_INFO);
 		process_priv_commamd(buf_handle->if_type, payload, payload_len);
 
 	} else if (header->packet_type == PACKET_TYPE_DATA) {
@@ -521,7 +521,7 @@ void process_rx_pkt(interface_buffer_handle_t *buf_handle)
 		}
 #if defined(CONFIG_BT_ENABLED) && BLUETOOTH_HCI
 		else if (buf_handle->if_type == ESP_HCI_IF) {
-			/*ESP_LOG_BUFFER_HEXDUMP("H->S BT", payload, payload_len, ESP_LOG_INFO);*/
+			ESP_LOG_BUFFER_HEXDUMP("H->S BT", payload, payload_len, ESP_LOG_INFO);
 			process_hci_rx_pkt(payload, payload_len);
 		}
 #endif

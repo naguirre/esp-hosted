@@ -178,7 +178,7 @@ int station_rx_eapol(uint8_t *src_addr, uint8_t *buf, uint32_t len)
 		return ESP_FAIL;
 	}
 
-#if 0
+#if 1
 	if (len)
 		ESP_LOG_BUFFER_HEXDUMP("RXEapol", buf, len, ESP_LOG_INFO);
 #endif
@@ -191,7 +191,7 @@ int station_rx_eapol(uint8_t *src_addr, uint8_t *buf, uint32_t len)
 
 	memcpy((char *)tx_buf, buf, len);
 
-#if 0
+#if 1
 	if (len)
 		ESP_LOG_BUFFER_HEXDUMP("tx_buf", tx_buf, len, ESP_LOG_INFO);
 #endif
@@ -409,7 +409,7 @@ static int sta_rx_assoc(uint8_t type, uint8_t *frame, size_t len, uint8_t *sende
 	connect->frame_len = htole16(len + IEEE_HEADER_SIZE);
 	memcpy(connect->frame+IEEE_HEADER_SIZE, frame, len);
 
-	/*ESP_LOG_BUFFER_HEXDUMP(TAG, connect->frame, connect->frame_len, ESP_LOG_INFO);*/
+	ESP_LOG_BUFFER_HEXDUMP(TAG, connect->frame, connect->frame_len, ESP_LOG_INFO);
 
 	ret = send_command_event(&buf_handle);
 	if (ret != pdTRUE) {
@@ -540,7 +540,7 @@ static int sta_rx_auth(uint8_t type, uint8_t *frame, size_t len, uint8_t *sender
 	event->frame_len = htole16(len + IEEE_HEADER_SIZE);
 	memcpy(event->frame+IEEE_HEADER_SIZE, frame, len);
 
-	/*ESP_LOG_BUFFER_HEXDUMP(TAG, event->frame, event->frame_len, ESP_LOG_INFO);*/
+	ESP_LOG_BUFFER_HEXDUMP(TAG, event->frame, event->frame_len, ESP_LOG_INFO);
 
 	ret = send_command_event(&buf_handle);
 	if (ret != pdTRUE) {
@@ -611,7 +611,7 @@ DONE:
 
 static int is_valid_assoc_resp(uint8_t *frame, size_t len, uint8_t *src_addr)
 {
-    /*ESP_LOG_BUFFER_HEXDUMP("assoc src addr", src_addr, MAC_ADDR_LEN, ESP_LOG_INFO);*/
+    ESP_LOG_BUFFER_HEXDUMP("assoc src addr", src_addr, MAC_ADDR_LEN, ESP_LOG_INFO);
 
     if (!ap_bssid || !len) {
 	   ESP_LOGE(TAG, "%s:%u AP bssid is not found, Return failure\n",
@@ -630,7 +630,7 @@ static int is_valid_assoc_resp(uint8_t *frame, size_t len, uint8_t *src_addr)
 	   return false;
     }
 
-    /*ESP_LOG_BUFFER_HEXDUMP("assoc frame:", frame, len, ESP_LOG_INFO);*/
+    ESP_LOG_BUFFER_HEXDUMP("assoc frame:", frame, len, ESP_LOG_INFO);
 
     if (frame[IE_POS_ASSOC_RESP_STATUS] == 0)
 	   return true;
@@ -661,7 +661,7 @@ static int handle_wpa_sta_rx_mgmt(uint8_t type, uint8_t *frame, size_t len, uint
 
 	case WLAN_FC_STYPE_AUTH:
 		ESP_LOGI(TAG, "%s:%u Auth[%u] recvd\n", __func__, __LINE__, type);
-		/*ESP_LOG_BUFFER_HEXDUMP(TAG, frame, len, ESP_LOG_INFO);*/
+		ESP_LOG_BUFFER_HEXDUMP(TAG, frame, len, ESP_LOG_INFO);
 		sta_rx_auth(type, frame, len, sender, rssi, channel, current_tsf);
 		break;
 
@@ -840,7 +840,7 @@ int process_set_mcast_mac_list(uint8_t if_type, uint8_t *payload, uint16_t paylo
 	memcpy(mac_list.mac_addr, cmd_mcast_mac_list->mcast_addr,
 			sizeof(mac_list.mac_addr));
 
-	/*ESP_LOG_BUFFER_HEXDUMP("MAC Filter", (uint8_t *) &mac_list, sizeof(mac_list), ESP_LOG_INFO);*/
+	ESP_LOG_BUFFER_HEXDUMP("MAC Filter", (uint8_t *) &mac_list, sizeof(mac_list), ESP_LOG_INFO);
 
 	buf_handle.if_type = if_type;
 	buf_handle.if_num = 0;
@@ -932,7 +932,7 @@ int process_tx_power(uint8_t if_type, uint8_t *payload, uint16_t payload_len, ui
 		esp_wifi_set_max_tx_power(max_tx_power);
 	}
 
-	/*ESP_LOG_BUFFER_HEXDUMP("MAC Filter", (uint8_t *) &mac_list, sizeof(mac_list), ESP_LOG_INFO);*/
+	ESP_LOG_BUFFER_HEXDUMP("MAC Filter", (uint8_t *) &mac_list, sizeof(mac_list), ESP_LOG_INFO);
 
 	buf_handle.if_type = if_type;
 	buf_handle.if_num = 0;
@@ -1227,10 +1227,10 @@ int process_auth_request(uint8_t if_type, uint8_t *payload, uint16_t payload_len
 
 		esp_wifi_register_mgmt_frame_internal(type, 0);
 
-		/* ESP_LOG_BUFFER_HEXDUMP("BSSID", cmd_auth->bssid, MAC_ADDR_LEN, ESP_LOG_INFO); */
+		ESP_LOG_BUFFER_HEXDUMP("BSSID", cmd_auth->bssid, MAC_ADDR_LEN, ESP_LOG_INFO);
 		for (int i = 0; (i < DEFAULT_SCAN_LIST_SIZE) && (i < ap_count); i++) {
-			/*ESP_LOG_BUFFER_HEXDUMP("Next BSSID", ap_info[i].bssid, MAC_ADDR_LEN, ESP_LOG_INFO);
-			  ESP_LOGI(TAG, "ssid: %s, authmode: %u", ap_info[i].ssid, ap_info[i].authmode);*/
+			ESP_LOG_BUFFER_HEXDUMP("Next BSSID", ap_info[i].bssid, MAC_ADDR_LEN, ESP_LOG_INFO);
+			  ESP_LOGI(TAG, "ssid: %s, authmode: %u", ap_info[i].ssid, ap_info[i].authmode);
 			if (memcmp(ap_info[i].bssid, cmd_auth->bssid, MAC_ADDR_LEN) == 0) {
 				memcpy(wifi_config.sta.ssid, ap_info[i].ssid, MAX_SSID_LEN);
 				auth_type = ap_info[i].authmode;
@@ -1617,7 +1617,7 @@ int process_get_mac(uint8_t if_type)
 	}
 
 
-	/*ESP_LOG_BUFFER_HEXDUMP(TAG, mac, MAC_ADDR_LEN, ESP_LOG_INFO);*/
+	ESP_LOG_BUFFER_HEXDUMP(TAG, mac, MAC_ADDR_LEN, ESP_LOG_INFO);
 
 	buf_handle.if_type = if_type;
 	buf_handle.if_num = 0;
