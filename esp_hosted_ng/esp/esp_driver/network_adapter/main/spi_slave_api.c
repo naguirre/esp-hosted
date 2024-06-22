@@ -641,6 +641,7 @@ static interface_handle_t * esp_spi_init(void)
     /* Configuration for the SPI slave interface */
     spi_slave_interface_config_t slvcfg = {
         .mode = g_spi_mode,
+        //.mode = SPI_MODE_1,
         .spics_io_num = GPIO_CS,
         .queue_size = SPI_QUEUE_SIZE,
         .flags = 0,
@@ -674,7 +675,6 @@ static interface_handle_t * esp_spi_init(void)
     gpio_set_pull_mode(GPIO_MOSI, GPIO_PULLUP_ONLY);
     gpio_set_pull_mode(GPIO_SCLK, GPIO_PULLUP_ONLY);
     gpio_set_pull_mode(GPIO_CS, GPIO_PULLUP_ONLY);
-
 
     ESP_LOGI(TAG, "SPI Ctrl:%u mode: %u, GPIOs: MOSI: %u, MISO: %u, CS: %u, CLK: %u HS: %u DR: %u\n",
         ESP_SPI_CONTROLLER, slvcfg.mode,
