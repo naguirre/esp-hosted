@@ -85,7 +85,7 @@ static const char TAG[] = "FW_SPI";
 	#define GPIO_CS 			10
 	#define DMA_CHAN			SPI_DMA_CH_AUTO
 
-	#define SPI_CLK_MHZ			30
+	#define SPI_CLK_MHZ			1
 
 #elif defined CONFIG_IDF_TARGET_ESP32S3
 
@@ -455,7 +455,7 @@ static void spi_transaction_post_process_task(void* pvParameters)
 			continue;
 		}
 
-		/*ESP_LOG_BUFFER_HEXDUMP(TAG, spi_trans->tx_buffer, 32, ESP_LOG_INFO);*/
+		ESP_LOG_BUFFER_HEXDUMP(TAG, spi_trans->tx_buffer, 32, ESP_LOG_INFO);
 
 		/* Free any tx buffer, data is not relevant anymore */
 		if (spi_trans->tx_buffer) {
@@ -507,7 +507,7 @@ static interface_handle_t * esp_spi_init(void)
 
 	/* Configuration for the SPI slave interface */
 	spi_slave_interface_config_t slvcfg={
-		.mode=SPI_MODE_2,
+		.mode=SPI_MODE_1,
 		.spics_io_num=GPIO_CS,
 		.queue_size=SPI_QUEUE_SIZE,
 		.flags=0,
@@ -541,6 +541,8 @@ static interface_handle_t * esp_spi_init(void)
 	gpio_set_pull_mode(GPIO_MOSI, GPIO_PULLUP_ONLY);
 	gpio_set_pull_mode(GPIO_SCLK, GPIO_PULLUP_ONLY);
 	gpio_set_pull_mode(GPIO_CS, GPIO_PULLUP_ONLY);
+
+	printf("SPI Slave mode : %d\n", slvcfg.mode);
 
 	/* Initialize SPI slave interface */
 	ret=spi_slave_initialize(ESP_SPI_CONTROLLER, &buscfg, &slvcfg, DMA_CHAN);
