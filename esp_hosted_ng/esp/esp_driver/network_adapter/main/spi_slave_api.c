@@ -43,7 +43,7 @@ static const char TAG[] = "FW_SPI";
 #define MAKE_SPI_DMA_ALIGNED(VAL)  (VAL += SPI_DMA_ALIGNMENT_BYTES - \
 				((VAL)& SPI_DMA_ALIGNMENT_MASK))
 
-uint8_t g_spi_mode = SPI_MODE_1;
+uint8_t g_spi_mode = SPI_MODE_2;
 
 /* Chipset specific configurations */
 #ifdef CONFIG_IDF_TARGET_ESP32
@@ -490,6 +490,31 @@ static void spi_transaction_post_process_task(void* pvParameters)
 	}
 }
 
+static void IRAM_ATTR gpio_disable_hs_isr_handler(void* arg)
+{
+	WRITE_PERI_REG(GPIO_OUT_W1TC_REG, (1 << gpio_handshake));
+}
+
+static void register_hs_disable_pin(uint32_t gpio_num)
+{
+    if (gpio_num != -1) {
+    gpio_reset_pin(gpio_num);
+
+    gpio_config_t slave_disable_hs_pin_conf={
+        .intr_type=GPIO_INTR_DISABLE,
+        .mode=GPIO_MODE_INPUT,
+        .pull_up_en=1,
+        .pin_bit_mask=(1<<gpio_num)
+    };
+
+    gpio_config(&slave_disable_hs_pin_conf);
+    gpio_set_intr_type(gpio_num, GPIO_INTR_NEGEDGE);
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(gpio_num, gpio_disable_hs_isr_handler, NULL);
+    }
+}
+
+
 static interface_handle_t * esp_spi_init(void)
 {
 	esp_err_t ret = ESP_OK;
@@ -550,6 +575,8 @@ static interface_handle_t * esp_spi_init(void)
 	gpio_set_pull_mode(GPIO_MOSI, GPIO_PULLUP_ONLY);
 	gpio_set_pull_mode(GPIO_SCLK, GPIO_PULLUP_ONLY);
 	gpio_set_pull_mode(GPIO_CS, GPIO_PULLUP_ONLY);
+
+	register_hs_disable_pin(GPIO_CS);
 
 	printf("SPI Slave mode : %d\n", slvcfg.mode);
 
